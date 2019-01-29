@@ -8,7 +8,7 @@ import crawl_utils as cu
 from OpenWPM.automation import CommandSequence, TaskManager
 
 NUM_BROWSERS = 15
-OUTPUT_NAME = 'XXX'
+OUTPUT_NAME = '2019_01_28-firefox_60_10k_test'
 SITES = ['http://' + x for x in cu.get_top_1m(
     os.path.expanduser('~/Desktop/%s/' % OUTPUT_NAME))]
 
@@ -17,8 +17,8 @@ manager_params, browser_params = TaskManager.load_default_params(NUM_BROWSERS)
 for i in range(NUM_BROWSERS):
     browser_params[i]['cookie_instrument'] = True
     browser_params[i]['js_instrument'] = True
-    browser_params[i]['save_javascript'] = True
     browser_params[i]['http_instrument'] = True
+    browser_params[i]['navigation_instrument'] = True
     browser_params[i]['headless'] = True
 
 manager_params['data_directory'] = '~/Desktop/%s/' % OUTPUT_NAME
