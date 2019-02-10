@@ -37,7 +37,7 @@ branch_name = sys.argv[1]
 crawl_script = sys.argv[2]
 crawl_name = sys.argv[3]
 if len(sys.argv) > 4:
-    storage_size = sys.argv[4]
+    storage_size = int(sys.argv[4])
 else:
     storage_size = None
 
