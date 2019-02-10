@@ -29,7 +29,7 @@ manager_params['log_directory'] = '~/Desktop/%s/' % OUTPUT_NAME
 # manager_params['s3_directory'] = OUTPUT_NAME
 
 manager = TaskManager.TaskManager(manager_params, browser_params)
-for site in SITES[0:5000]:
+for site in SITES[0:10000]:
     command_sequence = CommandSequence.CommandSequence(site, reset=True)
     command_sequence.get(sleep=10, timeout=60)
     command_sequence.recursive_dump_page_source('source')
