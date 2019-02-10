@@ -19,14 +19,27 @@ DATE_PREFIX = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')
 
 STARTUP_SCRIPT_TEMPLATE = open('instance_startup.sh', 'r').read()
 
-if len(sys.argv) != 4:
+VOLUME_INFO = {
+    'DeviceName': '/dev/sda1',
+    'Ebs': {
+        'VolumeSize': None,
+        'DeleteOnTermination': True,
+        'VolumeType': 'gp2'
+    }
+}
+
+if len(sys.argv) < 4:
     print("Usage: python instance_creator.py "
-          "[BRANCH_NAME] [CRAWL_SCRIPT] [CRAWL_NAME]")
+          "[BRANCH_NAME] [CRAWL_SCRIPT] [CRAWL_NAME] ([STORAGE_SIZE])")
     sys.exit(1)
 
 branch_name = sys.argv[1]
 crawl_script = sys.argv[2]
 crawl_name = sys.argv[3]
+if len(sys.argv) > 4:
+    storage_size = sys.argv[4]
+else:
+    storage_size = None
 
 startup_script = STARTUP_SCRIPT_TEMPLATE.format(
     branch_name,
@@ -36,17 +49,32 @@ startup_script = STARTUP_SCRIPT_TEMPLATE.format(
 )
 
 ec2 = boto3.resource('ec2', region_name=REGION)
-instance = ec2.create_instances(
-    ImageId=AMI_ID,
-    MinCount=NUM_INSTANCES,
-    MaxCount=NUM_INSTANCES,
-    KeyName=KEY_NAME,
-    UserData=startup_script,
-    InstanceType=INSTANCE_TYPE,
-    IamInstanceProfile={
-        'Arn': IAM_ARN,
-    }
-)[0]
+if storage_size is None:
+    instance = ec2.create_instances(
+        ImageId=AMI_ID,
+        MinCount=NUM_INSTANCES,
+        MaxCount=NUM_INSTANCES,
+        KeyName=KEY_NAME,
+        UserData=startup_script,
+        InstanceType=INSTANCE_TYPE,
+        IamInstanceProfile={
+            'Arn': IAM_ARN,
+        }
+    )[0]
+else:
+    VOLUME_INFO['Ebs']['VolumeSize'] = storage_size
+    instance = ec2.create_instances(
+        ImageId=AMI_ID,
+        MinCount=NUM_INSTANCES,
+        MaxCount=NUM_INSTANCES,
+        KeyName=KEY_NAME,
+        UserData=startup_script,
+        InstanceType=INSTANCE_TYPE,
+        BlockDeviceMappings=[VOLUME_INFO],
+        IamInstanceProfile={
+            'Arn': IAM_ARN,
+        }
+    )[0]
 instance.create_tags(
     Tags=[{
         'Key': 'Name',
