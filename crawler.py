@@ -18,18 +18,20 @@ for i in range(NUM_BROWSERS):
     browser_params[i]['cookie_instrument'] = True
     browser_params[i]['js_instrument'] = True
     browser_params[i]['save_javascript'] = True
+    browser_params[i]['save_documents'] = True
     browser_params[i]['http_instrument'] = True
     browser_params[i]['headless'] = True
 
 manager_params['data_directory'] = '~/Desktop/%s/' % OUTPUT_NAME
 manager_params['log_directory'] = '~/Desktop/%s/' % OUTPUT_NAME
-manager_params['output_format'] = 's3'
-manager_params['s3_bucket'] = 'openwpm-crawls'
-manager_params['s3_directory'] = OUTPUT_NAME
+# manager_params['output_format'] = 's3'
+# manager_params['s3_bucket'] = 'openwpm-crawls'
+# manager_params['s3_directory'] = OUTPUT_NAME
 
 manager = TaskManager.TaskManager(manager_params, browser_params)
-for site in SITES[0:10000]:
+for site in SITES[0:5000]:
     command_sequence = CommandSequence.CommandSequence(site, reset=True)
     command_sequence.get(sleep=10, timeout=60)
+    command_sequence.recursive_dump_page_source('source')
     manager.execute_command_sequence(command_sequence)
 manager.close()
