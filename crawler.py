@@ -28,7 +28,7 @@ manager_params['s3_bucket'] = 'openwpm-crawls'
 manager_params['s3_directory'] = OUTPUT_NAME
 
 manager = TaskManager.TaskManager(manager_params, browser_params)
-for site in SITES[0:10000]:
+for site in SITES[0:25000]:
     command_sequence = CommandSequence.CommandSequence(site, reset=True)
     command_sequence.get(sleep=10, timeout=60)
     manager.execute_command_sequence(command_sequence)
